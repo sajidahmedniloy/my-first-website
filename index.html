@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COGNIX — IQ Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Animated Background -->
+<canvas id="bg-canvas"></canvas>
+<div class="bg-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="orb orb-4"></div>
+
+<nav>
+  <div class="logo">COG<span>NIX</span></div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nav-home" onclick="showIntro()">Home</button>
+    <button class="nav-link" id="nav-about" onclick="showAbout()">About</button>
+  </div>
+</nav>
+
+<!-- ABOUT MODAL -->
+<div id="about-overlay" onclick="closeAbout()" style="display:none;position:fixed;inset:0;background:#00000088;backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;padding:24px;">
+  <div onclick="event.stopPropagation()" style="background:var(--surface);border:1px solid var(--border);border-radius:24px;max-width:560px;width:100%;padding:52px 48px;position:relative;animation:cardIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards;">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:24px 24px 0 0;"></div>
+    <button onclick="closeAbout()" style="position:absolute;top:20px;right:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">✕</button>
+    <div style="font-family:'DM Mono',monospace;font-size:0.7rem;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:16px;">⬡ About Cognix</div>
+    <h2 style="font-family:'DM Serif Display',serif;font-size:1.9rem;margin-bottom:20px;line-height:1.2;">What is this <em style="font-style:italic;color:var(--accent2);">test?</em></h2>
+    <p style="color:var(--muted);line-height:1.75;margin-bottom:20px;font-size:0.95rem;">Cognix is a cognitive assessment tool designed to estimate your IQ through four core domains — Logic, Pattern Recognition, Mathematics, and Spatial Reasoning. Each session draws 15 unique questions from a pool of 125+, ensuring a fresh challenge every time.</p>
+    <p style="color:var(--muted);line-height:1.75;margin-bottom:32px;font-size:0.95rem;">Your score is calculated based on both <strong style="color:var(--text);">accuracy</strong> and <strong style="color:var(--text);">response speed</strong>, reflecting the two key components measured in professional IQ assessments.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;">
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--accent2);">125+</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Unique Questions</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--accent2);">4</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Cognitive Domains</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--accent2);">60s</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">Per Question</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:18px;">
+        <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;color:var(--accent2);">70–145</div>
+        <div style="font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px;">IQ Score Range</div>
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:24px;font-family:'DM Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:1px;text-align:center;">
+      ⚠ This is an entertainment tool, not a clinical assessment. For a certified IQ evaluation, consult a licensed psychologist.
+    </div>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- INTRO SCREEN -->
+  <div class="card" id="screen-intro">
+    <div class="intro-eyebrow">⬡ COGNITIVE ASSESSMENT</div>
+    <h1 class="intro-title">Measure your <em>intelligence</em> quotient</h1>
+    <p class="intro-sub">A scientifically-structured test measuring logical reasoning, pattern recognition, and mathematical aptitude. 15 questions · ~12 minutes.</p>
+    <div class="stats-row">
+      <div class="stat">
+        <span class="stat-number">15</span>
+        <span class="stat-label">Questions</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">4</span>
+        <span class="stat-label">Categories</span>
+      </div>
+      <div class="stat">
+        <span class="stat-number">60s</span>
+        <span class="stat-label">Per Question</span>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="startTest()">
+      Begin Assessment
+      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div class="card" id="screen-question">
+    <div class="q-header">
+      <div class="q-counter" id="q-counter">Q 01 / 15</div>
+      <div class="q-timer" id="q-timer">00:60</div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+    </div>
+    <div class="category-tag" id="category-tag">⬡ LOGIC</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="pattern-area" id="pattern-area" style="display:none"></div>
+    <div class="options-grid" id="options-grid"></div>
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      Next Question
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div class="card" id="screen-result">
+    <div class="iq-display">
+      <div class="iq-label">YOUR ESTIMATED IQ SCORE</div>
+      <div class="iq-number" id="iq-number">—</div>
+      <div class="iq-grade" id="iq-grade"></div>
+    </div>
+
+    <div class="result-bar-container">
+      <div class="result-bar-label">
+        <span>Below Average</span>
+        <span>Average</span>
+        <span>Genius</span>
+      </div>
+      <div class="result-bar-track">
+        <div class="result-bar-fill" id="result-bar-fill"></div>
+        <div class="result-bar-marker" id="result-bar-marker"></div>
+      </div>
+    </div>
+
+    <div class="score-breakdown">
+      <div class="score-item">
+        <span class="score-item-val" id="res-correct" style="color: var(--green)">0</span>
+        <span class="score-item-lbl">Correct</span>
+      </div>
+      <div class="score-item">
+        <span class="score-item-val" id="res-wrong" style="color: var(--red)">0</span>
+        <span class="score-item-lbl">Wrong</span>
+      </div>
+      <div class="score-item">
+        <span class="score-item-val" id="res-time" style="color: var(--gold)">0s</span>
+        <span class="score-item-lbl">Avg Time</span>
+      </div>
+    </div>
+
+    <p class="result-desc" id="result-desc"></p>
+
+    <button class="btn-primary" onclick="startTest()" style="margin-bottom: 12px">
+      Retake Test
+    </button>
+    <button class="retry-btn" onclick="showIntro()">
+      Back to Home
+    </button>
+  </div>
+</div>
+
+<script>
+// Full question bank — 15 questions are randomly selected each attempt
+const questionBank = [
+
+  // ══════════════════════════════════════
+  // ⬡ LOGIC  (35 questions)
+  // ══════════════════════════════════════
+  { category:"⬡ LOGIC", text:"If all Blips are Blops, and all Blops are Blings, which must be true?", options:["All Blings are Blips","All Blips are Blings","No Blips are Blings","Some Blings are Blops"], answer:1 },
+  { category:"⬡ LOGIC", text:"Some months have 31 days, others have 30 days. How many months have 28 days?", options:["1","2","4","12"], answer:3 },
+  { category:"⬡ LOGIC", text:"A doctor gives you 3 pills and says take one every half hour. How long before all pills are taken?", options:["1.5 hours","1 hour","30 minutes","2 hours"], answer:1 },
+  { category:"⬡ LOGIC", text:"In a room, every person shakes hands once with every other. With 5 people, how many handshakes occur?", options:["5","8","10","20"], answer:2 },
+  { category:"⬡ LOGIC", text:"You have two ropes that each take 1 hour to burn unevenly. How do you measure exactly 45 minutes?", options:["Burn one from both ends, then light the second","Burn both from one end","Cut one rope in half","Impossible to measure"], answer:0 },
+  { category:"⬡ LOGIC", text:"If you're running a race and overtake the person in 2nd place, what place are you in?", options:["1st","2nd","3rd","It depends"], answer:1 },
+  { category:"⬡ LOGIC", text:"A is taller than B. C is taller than A. Who is the shortest?", options:["A","B","C","Cannot determine"], answer:1 },
+  { category:"⬡ LOGIC", text:"All roses are flowers. Some flowers fade quickly. Therefore:", options:["All roses fade quickly","Some roses may fade quickly","No roses fade quickly","Roses never fade"], answer:1 },
+  { category:"⬡ LOGIC", text:"Mary's father has 5 daughters: Nana, Nene, Nini, Nono. What is the 5th daughter's name?", options:["Nunu","Nana","Mary","Nina"], answer:2 },
+  { category:"⬡ LOGIC", text:"A bat and ball cost $1.10 total. The bat costs $1 more than the ball. How much does the ball cost?", options:["10¢","5¢","15¢","20¢"], answer:1 },
+  { category:"⬡ LOGIC", text:"It takes 5 workers 5 days to dig 5 holes. How long does 1 worker take to dig 1 hole?", options:["1 day","5 days","25 days","10 days"], answer:1 },
+  { category:"⬡ LOGIC", text:"A is the brother of B. B is the sister of C. C is the father of D. How is A related to D?", options:["Uncle","Grandfather","Father","Aunt"], answer:0 },
+  { category:"⬡ LOGIC", text:"A farmer has 17 sheep. All but 9 die. How many are left?", options:["8","9","17","0"], answer:1 },
+  { category:"⬡ LOGIC", text:"You are in a dark room with a candle, a wood stove, and a gas lamp. You only have one match. What do you light first?", options:["The candle","The wood stove","The gas lamp","The match"], answer:3 },
+  { category:"⬡ LOGIC", text:"Which is heavier: a kilogram of feathers or a kilogram of iron?", options:["Feathers","Iron","They are equal","Depends on altitude"], answer:2 },
+  { category:"⬡ LOGIC", text:"A rooster lays an egg on the peak of a roof. Which way does it roll?", options:["Left","Right","Downhill","Roosters don't lay eggs"], answer:3 },
+  { category:"⬡ LOGIC", text:"How many times can you subtract 10 from 100?", options:["10","9","Once","Infinitely"], answer:2 },
+  { category:"⬡ LOGIC", text:"A box of coins weighs 1 kg. Each coin weighs 10 g. One stack of 10 bad coins weighs 9 g each. Which scale reading identifies the bad stack in one weighing?", options:["Weigh all stacks together","Use a balance scale","Label stacks 1–10, take n coins from stack n","Impossible"], answer:2 },
+  { category:"⬡ LOGIC", text:"If there are 3 apples and you take away 2, how many apples do YOU have?", options:["1","2","3","0"], answer:1 },
+  { category:"⬡ LOGIC", text:"Before Mt. Everest was discovered, what was the tallest mountain on Earth?", options:["K2","Kangchenjunga","Mt. Everest","Denali"], answer:2 },
+  { category:"⬡ LOGIC", text:"A man builds a house with 4 sides, each facing south. A bear walks past. What color is the bear?", options:["Brown","Black","White","Unknown"], answer:2 },
+  { category:"⬡ LOGIC", text:"Two fathers and two sons go fishing. They catch exactly 3 fish, one each. How is this possible?", options:["One fish was shared","They are a grandfather, father, and son","Two of them didn't fish","A fish was caught twice"], answer:1 },
+  { category:"⬡ LOGIC", text:"No B are C. Some A are B. Therefore:", options:["Some A are C","No A are C","Some A are not C","Cannot be determined"], answer:2 },
+  { category:"⬡ LOGIC", text:"Tom is 5 years older than Jane. In 10 years, Tom will be twice Jane's current age. How old is Jane now?", options:["5","10","15","20"], answer:0 },
+  { category:"⬡ LOGIC", text:"All even numbers are divisible by 2. 14 is even. Therefore:", options:["14 is divisible by 7","14 is divisible by 2","14 is not divisible by 4","14 is prime"], answer:1 },
+  { category:"⬡ LOGIC", text:"A clock shows 3:15. What is the angle between the hour and minute hands?", options:["0°","7.5°","52.5°","90°"], answer:1 },
+  { category:"⬡ LOGIC", text:"A snail climbs 3 m up a well each day but slips back 2 m each night. The well is 10 m deep. How many days to escape?", options:["7","8","10","12"], answer:1 },
+  { category:"⬡ LOGIC", text:"I have two coins totaling 30 cents. One is not a nickel. What are the coins?", options:["Two dimes","A quarter and a nickel","Two nickels and a dime","A quarter and a dime"], answer:1 },
+  { category:"⬡ LOGIC", text:"An electric train travels east at 80 mph. The wind blows west. Which direction does the smoke blow?", options:["East","West","No smoke — electric trains have none","North"], answer:2 },
+  { category:"⬡ LOGIC", text:"In a tournament where every loss eliminates a player, there are 256 players. How many games are played in total?", options:["128","255","256","512"], answer:1 },
+  { category:"⬡ LOGIC", text:"If you have a 10-litre jug, a 6-litre jug, and unlimited water, how do you measure exactly 4 litres?", options:["Fill 6, pour into 10, fill 6 again, top off 10 — 2 litres remain","Fill 10, pour into 6, repeat","Fill 6 twice, combine","Impossible"], answer:0 },
+  { category:"⬡ LOGIC", text:"A man looks at a photo and says 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the photo?", options:["His brother","Himself","His son","His father"], answer:2 },
+  { category:"⬡ LOGIC", text:"A windowless room has 3 light switches, each controlling one of 3 bulbs inside. You may enter once. How do you determine which switch controls which bulb?", options:["Guess","Turn on switch 1 for 5 min, then off; turn on switch 2; enter and feel bulbs","Use a mirror","Impossible"], answer:1 },
+  { category:"⬡ LOGIC", text:"Five houses of different colors stand in a row. The green house is directly to the left of the white house. What can we conclude?", options:["The green house is first","The white house is not first","The green house is not last","Both B and C"], answer:3 },
+  { category:"⬡ LOGIC", text:"If PQRS is a valid code and QRSP is also valid, what rule likely applies?", options:["Letters must be consonants","Cyclic rotation is allowed","Reverse spelling is allowed","No repeated letters"], answer:1 },
+
+  // ══════════════════════════════════════
+  // ◈ PATTERN  (35 questions)
+  // ══════════════════════════════════════
+  { category:"◈ PATTERN", text:"What comes next in the sequence?", pattern:"2  6  18  54  ?", options:["108","162","216","324"], answer:1 },
+  { category:"◈ PATTERN", text:"Identify the next number.", pattern:"1  4  9  16  25  ?", options:["30","36","42","49"], answer:1 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"1  1  2  3  5  8  ?", options:["12","13","14","16"], answer:1 },
+  { category:"◈ PATTERN", text:"What number replaces the question mark?", pattern:"16  →  4  →  2  →  ?", options:["0","1","√2","4"], answer:1 },
+  { category:"◈ PATTERN", text:"What letter comes next in the series?", pattern:"A  C  F  J  ?", options:["M","N","O","P"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"3  6  11  18  27  ?", options:["35","36","38","40"], answer:2 },
+  { category:"◈ PATTERN", text:"Find the missing number.", pattern:"7  14  28  56  ?", options:["96","100","112","120"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next in the series?", pattern:"Z  X  V  T  R  ?", options:["P","Q","S","O"], answer:0 },
+  { category:"◈ PATTERN", text:"Identify the next value.", pattern:"0  1  3  6  10  15  ?", options:["18","20","21","25"], answer:2 },
+  { category:"◈ PATTERN", text:"What is the missing number?", pattern:"81  27  9  3  ?", options:["0","1","2","3"], answer:1 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"2  3  5  7  11  13  ?", options:["15","16","17","19"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next in the series?", pattern:"AZ  BY  CX  DW  ?", options:["EV","FU","EU","FV"], answer:0 },
+  { category:"◈ PATTERN", text:"What is the next number?", pattern:"4  8  16  32  64  ?", options:["96","112","128","256"], answer:2 },
+  { category:"◈ PATTERN", text:"Find the next term.", pattern:"1  8  27  64  125  ?", options:["196","216","225","256"], answer:1 },
+  { category:"◈ PATTERN", text:"What replaces the ?", pattern:"100  91  83  76  70  ?", options:["63","64","65","66"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"5  10  20  40  ?", options:["60","70","80","90"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next in the letter series?", pattern:"B  D  G  K  P  ?", options:["U","V","W","X"], answer:1 },
+  { category:"◈ PATTERN", text:"What is the missing number?", pattern:"2  6  12  20  30  ?", options:["40","42","44","46"], answer:1 },
+  { category:"◈ PATTERN", text:"What is the next value?", pattern:"1  2  4  7  11  16  ?", options:["20","21","22","23"], answer:2 },
+  { category:"◈ PATTERN", text:"Find the missing term.", pattern:"3  9  27  81  ?", options:["162","243","324","486"], answer:1 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"1  3  7  15  31  ?", options:["47","53","59","63"], answer:3 },
+  { category:"◈ PATTERN", text:"What letter is missing?", pattern:"A  E  I  ?  U", options:["M","N","O","P"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"10  8  11  7  12  6  ?", options:["11","13","14","15"], answer:1 },
+  { category:"◈ PATTERN", text:"Find the next number.", pattern:"2  5  11  23  47  ?", options:["89","93","95","97"], answer:2 },
+  { category:"◈ PATTERN", text:"What is the missing number?", pattern:"144  121  100  81  ?", options:["60","64","70","72"], answer:1 },
+  { category:"◈ PATTERN", text:"What replaces the ?", pattern:"1  4  13  40  121  ?", options:["282","340","364","366"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"M  T  W  T  F  ?", options:["M","S","T","W"], answer:1 },
+  { category:"◈ PATTERN", text:"What is the next pair?", pattern:"11  22  33  44  ?", options:["45","50","55","60"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"6  11  21  41  81  ?", options:["151","161","162","180"], answer:1 },
+  { category:"◈ PATTERN", text:"Find the next letter.", pattern:"C  F  I  L  O  ?", options:["P","Q","R","S"], answer:2 },
+  { category:"◈ PATTERN", text:"What is the missing value?", pattern:"2  12  36  80  150  ?", options:["192","210","252","294"], answer:2 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"1  2  6  24  120  ?", options:["620","720","820","920"], answer:1 },
+  { category:"◈ PATTERN", text:"What replaces the ?", pattern:"13  11  14  10  15  9  ?", options:["14","15","16","17"], answer:2 },
+  { category:"◈ PATTERN", text:"Find the next number.", pattern:"4  5  9  14  23  37  ?", options:["55","60","61","65"], answer:1 },
+  { category:"◈ PATTERN", text:"What comes next?", pattern:"J  F  M  A  M  J  ?", options:["A","J","N","S"], answer:1 },
+
+  // ══════════════════════════════════════
+  // ⊕ MATH  (30 questions)
+  // ══════════════════════════════════════
+  { category:"⊕ MATH", text:"A train travels 240 km in 3 hours. How long to travel 400 km at the same speed?", options:["4 hours","4.5 hours","5 hours","5.5 hours"], answer:2 },
+  { category:"⊕ MATH", text:"If 5 machines make 5 widgets in 5 minutes, how long do 100 machines take to make 100 widgets?", options:["1 minute","5 minutes","20 minutes","100 minutes"], answer:1 },
+  { category:"⊕ MATH", text:"What percentage of 200 is 50?", options:["10%","20%","25%","30%"], answer:2 },
+  { category:"⊕ MATH", text:"If 3x + 7 = 22, what is x?", options:["3","4","5","6"], answer:2 },
+  { category:"⊕ MATH", text:"A shirt costs $40 after a 20% discount. What was the original price?", options:["$48","$50","$52","$56"], answer:1 },
+  { category:"⊕ MATH", text:"What is the sum of interior angles in a triangle?", options:["90°","180°","270°","360°"], answer:1 },
+  { category:"⊕ MATH", text:"If a car depreciates 15% per year, what is its value after 2 years starting at $20,000?", options:["$14,000","$14,450","$17,000","$16,800"], answer:1 },
+  { category:"⊕ MATH", text:"What is 15% of 360?", options:["48","52","54","58"], answer:2 },
+  { category:"⊕ MATH", text:"A pool is filled by pipe A in 4 hours and pipe B in 6 hours. How long do both pipes take together?", options:["2h 24min","2h 40min","3h","3h 20min"], answer:0 },
+  { category:"⊕ MATH", text:"How many prime numbers are there between 1 and 20?", options:["6","7","8","9"], answer:2 },
+  { category:"⊕ MATH", text:"What is √(144)?", options:["11","12","13","14"], answer:1 },
+  { category:"⊕ MATH", text:"If 40% of a number is 80, what is the number?", options:["120","160","200","240"], answer:2 },
+  { category:"⊕ MATH", text:"A car travels 60 mph for 2.5 hours. How far does it go?", options:["120 miles","130 miles","150 miles","175 miles"], answer:2 },
+  { category:"⊕ MATH", text:"What is the LCM of 4 and 6?", options:["6","8","12","24"], answer:2 },
+  { category:"⊕ MATH", text:"A store raises a price by 10%, then reduces it by 10%. The final price compared to the original is:", options:["The same","1% lower","1% higher","10% lower"], answer:1 },
+  { category:"⊕ MATH", text:"Solve: 2³ × 2² = ?", options:["2⁵","2⁶","4⁵","64"], answer:0 },
+  { category:"⊕ MATH", text:"If the ratio of boys to girls in a class is 3:5 and there are 40 students, how many are boys?", options:["12","15","18","24"], answer:1 },
+  { category:"⊕ MATH", text:"What is the area of a circle with radius 7? (Use π ≈ 3.14)", options:["43.98","153.86","154","219.8"], answer:1 },
+  { category:"⊕ MATH", text:"A 12-hour clock shows 7:00. What angle does the hour hand make with the 12?", options:["180°","195°","210°","215°"], answer:2 },
+  { category:"⊕ MATH", text:"If log₁₀(100) = x, what is x?", options:["1","2","10","100"], answer:1 },
+  { category:"⊕ MATH", text:"What is the median of: 3, 7, 1, 9, 4, 6, 8?", options:["4","5","6","7"], answer:2 },
+  { category:"⊕ MATH", text:"How many ways can 3 people be arranged in a line?", options:["3","6","9","12"], answer:1 },
+  { category:"⊕ MATH", text:"A rectangle has sides 5 and 12. What is the length of its diagonal?", options:["10","11","13","17"], answer:2 },
+  { category:"⊕ MATH", text:"What is 0.25 expressed as a fraction in its simplest form?", options:["2/5","1/4","1/5","3/8"], answer:1 },
+  { category:"⊕ MATH", text:"In a class of 30, the average score is 72. One student's score of 42 is changed to 72. What is the new average?", options:["72","73","74","75"], answer:1 },
+  { category:"⊕ MATH", text:"If x² = 49, what are the possible values of x?", options:["7 only","−7 only","±7","±49"], answer:2 },
+  { category:"⊕ MATH", text:"A cube has a volume of 27 cm³. What is the length of one edge?", options:["3 cm","4 cm","5 cm","9 cm"], answer:0 },
+  { category:"⊕ MATH", text:"What is the sum of the first 10 positive integers?", options:["45","50","55","60"], answer:2 },
+  { category:"⊕ MATH", text:"Two numbers add to 50 and multiply to 600. What are they?", options:["20 and 30","25 and 25","15 and 35","10 and 40"], answer:0 },
+  { category:"⊕ MATH", text:"If 8 painters can paint a house in 6 days, how long do 12 painters take?", options:["3 days","4 days","5 days","6 days"], answer:1 },
+
+  // ══════════════════════════════════════
+  // ≋ SPATIAL  (25 questions)
+  // ══════════════════════════════════════
+  { category:"≋ SPATIAL", text:"How many faces does a cube have?", options:["4","5","6","8"], answer:2 },
+  { category:"≋ SPATIAL", text:"A square has an area of 81 cm². What is its perimeter?", options:["18 cm","27 cm","36 cm","45 cm"], answer:2 },
+  { category:"≋ SPATIAL", text:"How many edges does a tetrahedron have?", options:["4","6","8","12"], answer:1 },
+  { category:"≋ SPATIAL", text:"If you unfold a cube, how many squares form its net?", options:["4","5","6","8"], answer:2 },
+  { category:"≋ SPATIAL", text:"A sphere is cut by a plane. What shape is the cross-section always?", options:["Ellipse","Circle","Square","Oval"], answer:1 },
+  { category:"≋ SPATIAL", text:"How many diagonals does a regular hexagon have?", options:["6","8","9","12"], answer:2 },
+  { category:"≋ SPATIAL", text:"A rectangle has perimeter 40 cm and length 12 cm. What is its area?", options:["80 cm²","88 cm²","96 cm²","104 cm²"], answer:2 },
+  { category:"≋ SPATIAL", text:"How many vertices does an octahedron have?", options:["4","6","8","12"], answer:1 },
+  { category:"≋ SPATIAL", text:"A right triangle has legs of 6 and 8. What is the hypotenuse?", options:["10","12","14","16"], answer:0 },
+  { category:"≋ SPATIAL", text:"How many sides does a dodecagon have?", options:["10","11","12","14"], answer:2 },
+  { category:"≋ SPATIAL", text:"A cube is painted on all sides and then cut into 27 equal smaller cubes. How many small cubes have exactly 2 painted faces?", options:["8","12","16","18"], answer:1 },
+  { category:"≋ SPATIAL", text:"Which 3D shape has exactly one curved surface and one flat face?", options:["Sphere","Cone","Cylinder","Pyramid"], answer:1 },
+  { category:"≋ SPATIAL", text:"How many lines of symmetry does a regular pentagon have?", options:["0","3","5","10"], answer:2 },
+  { category:"≋ SPATIAL", text:"A cone and a cylinder have the same base radius and height. What is the ratio of their volumes?", options:["1:1","1:2","1:3","2:3"], answer:2 },
+  { category:"≋ SPATIAL", text:"If a triangle has angles of 45° and 90°, what is the third angle?", options:["35°","45°","55°","60°"], answer:1 },
+  { category:"≋ SPATIAL", text:"How many faces does a triangular prism have?", options:["3","4","5","6"], answer:2 },
+  { category:"≋ SPATIAL", text:"A square is folded in half diagonally. What shape is formed?", options:["Rectangle","Smaller square","Right triangle","Trapezoid"], answer:2 },
+  { category:"≋ SPATIAL", text:"What is the sum of all interior angles of a pentagon?", options:["360°","450°","540°","600°"], answer:2 },
+  { category:"≋ SPATIAL", text:"How many edges does a cube have?", options:["6","8","10","12"], answer:3 },
+  { category:"≋ SPATIAL", text:"A cylinder has radius 3 and height 5. What is its volume? (Use π ≈ 3.14)", options:["94.2","141.3","188.4","282.6"], answer:1 },
+  { category:"≋ SPATIAL", text:"If you rotate a rectangle 180° around its center, what do you get?", options:["The same rectangle","A different rectangle","A square","A triangle"], answer:0 },
+  { category:"≋ SPATIAL", text:"A regular octagon has how many lines of symmetry?", options:["4","6","8","16"], answer:2 },
+  { category:"≋ SPATIAL", text:"How many smaller 1×1 squares fit inside a 4×4 square grid (counting all sizes)?", options:["16","20","30","36"], answer:2 },
+  { category:"≋ SPATIAL", text:"A rectangular box is 4m × 3m × 2m. What is the length of the space diagonal?", options:["√24","√29","√36","√50"], answer:1 },
+  { category:"≋ SPATIAL", text:"If a shape has 6 vertices, 9 edges, and 5 faces, which solid is it?", options:["Cube","Tetrahedron","Triangular prism","Octahedron"], answer:2 },
+];
+
+const QUESTIONS_PER_TEST = 15;
+
+// Fisher-Yates shuffle
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Pick 15 random questions, ensuring category balance
+function pickQuestions() {
+  const byCategory = {};
+  questionBank.forEach(q => {
+    const c = q.category;
+    if (!byCategory[c]) byCategory[c] = [];
+    byCategory[c].push(q);
+  });
+  const cats = Object.keys(byCategory);
+  const perCat = Math.floor(QUESTIONS_PER_TEST / cats.length);
+  let selected = [];
+  cats.forEach(c => {
+    selected = selected.concat(shuffle(byCategory[c]).slice(0, perCat));
+  });
+  // Fill remainder randomly from leftovers
+  const leftovers = shuffle(questionBank.filter(q => !selected.includes(q)));
+  while (selected.length < QUESTIONS_PER_TEST && leftovers.length) {
+    selected.push(leftovers.pop());
+  }
+  return shuffle(selected);
+}
+
+let questions = [];
+let currentQ = 0;
+let score = 0;
+let answered = false;
+let timer = null;
+let timeLeft = 60;
+let totalTime = 0;
+let answerTimes = [];
+let questionStart = 0;
+
+function setActiveNav(id) {
+  document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showAbout() {
+  setActiveNav('nav-about');
+  document.getElementById('about-overlay').style.display = 'flex';
+}
+
+function closeAbout() {
+  document.getElementById('about-overlay').style.display = 'none';
+  setActiveNav('nav-home');
+}
+
+function showIntro() {
+  setActiveNav('nav-home');
+  hideAll();
+  document.getElementById('screen-intro').style.display = 'block';
+}
+
+function hideAll() {
+  ['screen-intro','screen-question','screen-result'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+function startTest() {
+  questions = pickQuestions();
+  currentQ = 0;
+  score = 0;
+  totalTime = 0;
+  answerTimes = [];
+  hideAll();
+  document.getElementById('screen-question').style.display = 'block';
+  loadQuestion();
+}
+
+function loadQuestion() {
+  answered = false;
+  timeLeft = 60;
+  questionStart = Date.now();
+
+  const q = questions[currentQ];
+  const letters = ['A','B','C','D'];
+
+  document.getElementById('q-counter').textContent = `Q ${String(currentQ+1).padStart(2,'0')} / ${questions.length}`;
+  document.getElementById('category-tag').textContent = q.category;
+  document.getElementById('q-text').textContent = q.text;
+
+  const patternEl = document.getElementById('pattern-area');
+  if (q.pattern) {
+    patternEl.style.display = 'flex';
+    patternEl.textContent = q.pattern;
+  } else {
+    patternEl.style.display = 'none';
+  }
+
+  const progress = (currentQ / questions.length) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i, btn);
+    grid.appendChild(btn);
+  });
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.classList.remove('visible');
+  nextBtn.textContent = currentQ === questions.length - 1 ? 'View Results' : 'Next Question';
+  nextBtn.innerHTML = currentQ === questions.length - 1
+    ? 'View Results <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M3 12a9 9 0 1018 0A9 9 0 003 12z"/></svg>'
+    : 'Next Question <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+
+  updateTimer();
+  if (timer) clearInterval(timer);
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      autoNext();
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  const el = document.getElementById('q-timer');
+  const mins = String(Math.floor(timeLeft/60)).padStart(2,'0');
+  const secs = String(timeLeft % 60).padStart(2,'0');
+  el.textContent = `${mins}:${secs}`;
+  el.className = timeLeft <= 10 ? 'q-timer urgent' : 'q-timer';
+}
+
+function selectAnswer(idx, btnEl) {
+  if (answered) return;
+  answered = true;
+  clearInterval(timer);
+
+  const elapsed = (Date.now() - questionStart) / 1000;
+  answerTimes.push(elapsed);
+
+  const q = questions[currentQ];
+  const btns = document.querySelectorAll('.option-btn');
+
+  btns[q.answer].classList.add('correct');
+  if (idx !== q.answer) {
+    btnEl.classList.add('wrong');
+  } else {
+    score++;
+  }
+
+  btns.forEach(b => b.onclick = null);
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function autoNext() {
+  if (!answered) {
+    answered = true;
+    const q = questions[currentQ];
+    const btns = document.querySelectorAll('.option-btn');
+    btns[q.answer].classList.add('correct');
+    btns.forEach(b => b.onclick = null);
+    answerTimes.push(60);
+  }
+  document.getElementById('next-btn').classList.add('visible');
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    showResult();
+  } else {
+    // animate card
+    const card = document.getElementById('screen-question');
+    card.style.opacity = '0';
+    card.style.transform = 'translateX(-20px)';
+    setTimeout(() => {
+      card.style.transition = 'none';
+      card.style.opacity = '1';
+      card.style.transform = 'translateX(20px)';
+      setTimeout(() => {
+        card.style.transition = 'all 0.3s ease';
+        card.style.transform = 'translateX(0)';
+        loadQuestion();
+      }, 50);
+    }, 200);
+  }
+}
+
+function showResult() {
+  if (timer) clearInterval(timer);
+  hideAll();
+  document.getElementById('screen-result').style.display = 'block';
+
+  // Calculate IQ: base 70, max ~145
+  const ratio = score / questions.length;
+  const avgTime = answerTimes.reduce((a,b) => a+b, 0) / answerTimes.length;
+  const speedBonus = Math.max(0, (60 - avgTime) / 60) * 15;
+  const iq = Math.round(70 + ratio * 65 + speedBonus);
+
+  let grade = '';
+  let desc = '';
+  if (iq >= 140) {
+    grade = 'Genius / Near Genius';
+    desc = 'Your performance places you in the top 0.1% of the population. You demonstrate extraordinary pattern recognition, logical reasoning, and mathematical ability.';
+  } else if (iq >= 130) {
+    grade = 'Very Superior Intelligence';
+    desc = 'Excellent performance! You demonstrate highly advanced cognitive abilities across all measured domains.';
+  } else if (iq >= 120) {
+    grade = 'Superior Intelligence';
+    desc = 'You scored above average with strong logical and analytical reasoning skills.';
+  } else if (iq >= 110) {
+    grade = 'High Average';
+    desc = 'You performed above the population mean, showing solid reasoning and problem-solving abilities.';
+  } else if (iq >= 90) {
+    grade = 'Average Range';
+    desc = 'Your score falls within the normal range, consistent with the majority of the population.';
+  } else {
+    grade = 'Below Average';
+    desc = 'This test is just one measure of cognition. Consider reviewing logical reasoning exercises and retaking the assessment.';
+  }
+
+  document.getElementById('iq-number').textContent = iq;
+  document.getElementById('iq-grade').textContent = grade;
+  document.getElementById('result-desc').textContent = desc;
+  document.getElementById('res-correct').textContent = score;
+  document.getElementById('res-wrong').textContent = questions.length - score;
+  document.getElementById('res-time').textContent = Math.round(avgTime) + 's';
+
+  // Bar position: IQ range 70-145 → 0-100%
+  const barPct = Math.min(100, Math.max(0, ((iq - 70) / 75) * 100));
+  setTimeout(() => {
+    document.getElementById('result-bar-fill').style.width = barPct + '%';
+    document.getElementById('result-bar-marker').style.left = barPct + '%';
+  }, 100);
+}
+
+// ── Animated Background ──────────────────────────────
+(function() {
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], stars = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Floating particles
+  for (let i = 0; i < 60; i++) {
+    particles.push({
+      x: Math.random() * 1920,
+      y: Math.random() * 1080,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      alpha: Math.random() * 0.5 + 0.1,
+      color: Math.random() > 0.5 ? '124,92,252' : '232,213,255',
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: Math.random() * 0.02 + 0.005,
+    });
+  }
+
+  // Static starfield
+  for (let i = 0; i < 120; i++) {
+    stars.push({
+      x: Math.random() * 1920,
+      y: Math.random() * 1080,
+      r: Math.random() * 0.8 + 0.2,
+      alpha: Math.random() * 0.4 + 0.05,
+      twinkleSpeed: Math.random() * 0.03 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2,
+    });
+  }
+
+  // Shooting stars
+  let shooters = [];
+  function spawnShooter() {
+    shooters.push({
+      x: Math.random() * W * 0.7,
+      y: Math.random() * H * 0.4,
+      len: Math.random() * 120 + 60,
+      speed: Math.random() * 6 + 4,
+      alpha: 1,
+      angle: Math.PI / 6 + (Math.random() - 0.5) * 0.3,
+      life: 0,
+      maxLife: Math.random() * 40 + 30,
+    });
+  }
+  setInterval(spawnShooter, 3000);
+  setTimeout(spawnShooter, 500);
+
+  let t = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.01;
+
+    // Draw stars (twinkle)
+    stars.forEach(s => {
+      const a = s.alpha * (0.5 + 0.5 * Math.sin(t * s.twinkleSpeed * 60 + s.twinkleOffset));
+      ctx.beginPath();
+      ctx.arc(s.x % W, s.y % H, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${a})`;
+      ctx.fill();
+    });
+
+    // Draw particles
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+      if (p.x < 0) p.x = W;
+      if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H;
+      if (p.y > H) p.y = 0;
+
+      const a = p.alpha * (0.6 + 0.4 * Math.sin(p.pulse));
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${p.color},${a})`;
+      ctx.fill();
+    });
+
+    // Draw connections between close particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 120) {
+          const a = (1 - dist / 120) * 0.06;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(124,92,252,${a})`;
+          ctx.lineWidth = 0.5;
+          ctx.stroke();
+        }
+      }
+    }
+
+    // Draw shooting stars
+    shooters = shooters.filter(s => s.life < s.maxLife);
+    shooters.forEach(s => {
+      s.life++;
+      const progress = s.life / s.maxLife;
+      const alpha = progress < 0.2 ? progress / 0.2 : 1 - (progress - 0.2) / 0.8;
+      const cx = s.x + Math.cos(s.angle) * s.speed * s.life;
+      const cy = s.y + Math.sin(s.angle) * s.speed * s.life;
+      const tailX = cx - Math.cos(s.angle) * s.len * alpha;
+      const tailY = cy - Math.sin(s.angle) * s.len * alpha;
+
+      const grad = ctx.createLinearGradient(tailX, tailY, cx, cy);
+      grad.addColorStop(0, `rgba(255,255,255,0)`);
+      grad.addColorStop(1, `rgba(255,255,255,${alpha * 0.9})`);
+      ctx.beginPath();
+      ctx.moveTo(tailX, tailY);
+      ctx.lineTo(cx, cy);
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Glow dot at head
+      ctx.beginPath();
+      ctx.arc(cx, cy, 2, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+showIntro();
+</script>
+</body>
+</html>
